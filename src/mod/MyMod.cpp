@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include <pl/Mod.hpp>
+#include <pl/ModMenu.hpp>
 
 namespace clange_me {
 
@@ -45,14 +46,14 @@ bool ClangeMeMod::load() {
 
 bool ClangeMeMod::enable() {
     auto &self = getSelf();
-    self.getLogger().debug("Enabling...");
-    if (!mConfig.enabled) {
-        self.getLogger().info("clange_me is disabled by config");
-        return true;
-    }
-
+    self.getLogger().info("It's Working GNG");
     self.getLogger().info("Config message: {}", mConfig.message);
-    return true;
+
+    return pl::modmenu::ModuleBuilder("test.hello", "It's Working GNG")
+        .modId(self.getId())
+        .description("If you see this, the mod loaded.")
+        .defaultEnabled(true)
+        .registerModule();
 }
 
 bool ClangeMeMod::disable() {
