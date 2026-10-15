@@ -45,19 +45,29 @@ bool ClangeMeMod::load() {
 }
 
 bool ClangeMeMod::enable() {
-    getSelf().getLogger().info("It's Working GNG");
+    auto &self = getSelf();
+    self.getLogger().info("It's Working GNG");
+
+    const bool ok = pl::modmenu::ModuleBuilder("clange_me.hello", "It's Working GNG")
+                        .modId(self.getId())
+                        .description("If you see this, the mod loaded.")
+                        .defaultEnabled(true)
+                        .config("opacity", "Opacity", pl::modmenu::ConfigType::SliderInt, "80", "0",
+                                "100")
+                        .registerModule();
+
+    self.getLogger().info("Menu module registered: {}", ok);
     return true;
 }
 
 bool ClangeMeMod::disable() {
     getSelf().getLogger().debug("Disabling...");
-    // Undo enable-time state here.
+    pl::modmenu::unregisterModule("clange_me.hello");
     return true;
 }
 
 bool ClangeMeMod::unload() {
     getSelf().getLogger().debug("Unloading...");
-    // Release load-time resources here.
     mConfigFile.reset();
     return true;
 }
