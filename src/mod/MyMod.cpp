@@ -7,10 +7,15 @@
 
 namespace clange_me {
 
+namespace {
+
+constexpr char kModuleId[] = "clange_me.hello";
+
+} // namespace
+
 ClangeMeMod &ClangeMeMod::instance() {
-    return []() -> ClangeMeMod & {
-        return *new ClangeMeMod();
-    }();
+    static ClangeMeMod instance;
+    return instance;
 }
 
 ClangeMeMod::ClangeMeMod()
@@ -101,8 +106,47 @@ bool ClangeMeMod::load() {
     self.getLogger().info(
         "[CLANGE_TRACE] Config value copied");
 
+    // Register the Mod Menu module during load(), matching the
+    // official LeviLaunchroid C++ example.
+    self.getLogger().info(
+        "[CLANGE_TRACE] About to register Mod Menu module");
+
+    const bool moduleRegistered =
+        pl::modmenu::ModuleBuilder(
+            kModuleId,
+            "It's Working GNG")
+            .modId(self.getId())
+            .description("If you see this, the mod loaded.")
+            .defaultEnabled(true)
+            .config(
+                "opacity",
+                "Opacity",
+                pl::modmenu::ConfigType::SliderInt,
+                "80",
+                "0",
+                "100")
+            .registerModule();
+
+    self.getLogger().info(
+        "[CLANGE_TRACE] registerModule() returned: {}",
+        moduleRegistered);
+
+    if (!moduleRegistered) {
+        self.getLogger().error(
+            "[CLANGE_TRACE] Mod Menu registration FAILED");
+        return false;
+    }
+
+    self.getLogger().info(
+        "[CLANGE_TRACE] Mod Menu registration SUCCEEDED");
+
     self.getLogger().info(
         "[CLANGE_TRACE] ===== LOAD END =====");
+
+    self.getLogger().info(
+        "Loaded {} from {}",
+        self.getName(),
+        self.getModDir().string());
 
     return true;
 }
@@ -110,74 +154,14 @@ bool ClangeMeMod::load() {
 bool ClangeMeMod::enable() {
     auto &self = getSelf();
 
-    self.getLogger().info("[CLANGE_TRACE] ===== ENABLE BEGIN =====");
+    self.getLogger().info(
+        "[CLANGE_TRACE] ===== ENABLE BEGIN =====");
 
     self.getLogger().info(
-        "[CLANGE_TRACE] About to construct ModuleBuilder");
-
-    auto builder =
-        pl::modmenu::ModuleBuilder(
-            "clange_me.hello",
-            "It's Working GNG");
+        "[CLANGE_TRACE] enable() reached successfully");
 
     self.getLogger().info(
-        "[CLANGE_TRACE] ModuleBuilder constructed");
-
-    self.getLogger().info(
-        "[CLANGE_TRACE] About to call modId()");
-
-    builder.modId(self.getId());
-
-    self.getLogger().info(
-        "[CLANGE_TRACE] modId() completed");
-
-    self.getLogger().info(
-        "[CLANGE_TRACE] About to call description()");
-
-    builder.description(
-        "If you see this, the mod loaded.");
-
-    self.getLogger().info(
-        "[CLANGE_TRACE] description() completed");
-
-    self.getLogger().info(
-        "[CLANGE_TRACE] About to call defaultEnabled()");
-
-    builder.defaultEnabled(true);
-
-    self.getLogger().info(
-        "[CLANGE_TRACE] defaultEnabled() completed");
-
-    self.getLogger().info(
-        "[CLANGE_TRACE] About to call config()");
-
-    builder.config(
-        "opacity",
-        "Opacity",
-        pl::modmenu::ConfigType::SliderInt,
-        "80",
-        "0",
-        "100");
-
-    self.getLogger().info(
-        "[CLANGE_TRACE] config() completed");
-
-    self.getLogger().info(
-        "[CLANGE_TRACE] About to call registerModule()");
-
-    const bool ok = builder.registerModule();
-
-    self.getLogger().info(
-        "[CLANGE_TRACE] registerModule() returned: {}",
-        ok);
-
-    if (ok) {
-        self.getLogger().info(
-            "[CLANGE_TRACE] ===== ENABLE SUCCESS =====");
-    } else {
-        self.getLogger().error(
-            "[CLANGE_TRACE] ===== ENABLE REGISTRATION FAILED =====");
-    }
+        "[CLANGE_TRACE] ===== ENABLE END =====");
 
     return true;
 }
@@ -189,9 +173,9 @@ bool ClangeMeMod::disable() {
         "[CLANGE_TRACE] ===== DISABLE BEGIN =====");
 
     self.getLogger().info(
-        "[CLANGE_TRACE] About to unregister module");
+        "[CLANGE_TRACE] About to unregister Mod Menu module");
 
-    pl::modmenu::unregisterModule("clange_me.hello");
+    pl::modmenu::unregisterModule(kModuleId);
 
     self.getLogger().info(
         "[CLANGE_TRACE] unregisterModule() completed");
