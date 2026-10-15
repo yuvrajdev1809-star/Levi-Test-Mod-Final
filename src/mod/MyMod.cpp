@@ -45,15 +45,8 @@ bool ClangeMeMod::load() {
 }
 
 bool ClangeMeMod::enable() {
-    auto &self = getSelf();
-    self.getLogger().info("It's Working GNG");
-    self.getLogger().info("Config message: {}", mConfig.message);
-
-    return pl::modmenu::ModuleBuilder("test.hello", "It's Working GNG")
-        .modId(self.getId())
-        .description("If you see this, the mod loaded.")
-        .defaultEnabled(true)
-        .registerModule();
+    getSelf().getLogger().info("It's Working GNG");
+    return true;
 }
 
 bool ClangeMeMod::disable() {
